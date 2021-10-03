@@ -5,7 +5,7 @@
     "test": "jest"
   },
   "repository": "https://github.com/nomoret/refactoring.git",
-  "author": "br j <honuj9983@gmail.com>",
+  "author": "br j",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.15.5",
