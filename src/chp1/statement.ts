@@ -12,59 +12,89 @@ interface Plays {
   [index: string]: Play;
 }
 
+interface Performance {
+  playID: string;
+  audience: number;
+}
+
 interface Invoice {
   customer: string;
-  performances: {
-    playID: string;
-    audience: number;
-  }[];
+  performances: Performance[];
 }
 
 function statement(invoice: Invoice, plays: Plays): string {
-  let totalAmout = 0;
-  let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
-  const format = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format;
-
   for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
+    result += `  ${playFor(perf).name}: ${usd(amoutFor(perf))} (${
+      perf.audience
+    } seats)\n`;
+  }
 
-    let thisAmount = 0;
-    switch (play.type) {
+  result += `Amount owed is ${usd(totalAmout())}\n`;
+  result += `You earned ${totalVoulmeCredits()} credits\n`;
+  return result;
+
+  function totalAmout() {
+    let result = 0;
+    for (let perf of invoice.performances) {
+      result += amoutFor(perf);
+    }
+    return result;
+  }
+
+  function totalVoulmeCredits() {
+    let result = 0;
+    for (let perf of invoice.performances) {
+      result += volummeCreditsFor(perf);
+    }
+    return result;
+  }
+
+  function volummeCreditsFor(aPerformance: {
+    playID: string;
+    audience: number;
+  }) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if (PlayType.comedy === playFor(aPerformance).type) {
+      result += Math.floor(aPerformance.audience / 5);
+    }
+    return result;
+  }
+
+  function usd(aNumber: number) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    }).format(aNumber / 100);
+  }
+
+  function playFor(aPerformance: Performance) {
+    return plays[aPerformance.playID];
+  }
+
+  function amoutFor(aPerformance: Performance) {
+    let result = 0;
+    switch (playFor(aPerformance).type) {
       case "tragedy":
-        thisAmount = 40000;
-        if (perf.audience) {
-          thisAmount += 1000 * (perf.audience - 30);
+        result = 40000;
+        if (aPerformance.audience) {
+          result += 1000 * (aPerformance.audience - 30);
         }
         break;
       case "comedy":
-        thisAmount = 30000;
-        if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
+        result = 30000;
+        if (aPerformance.audience > 20) {
+          result += 10000 + 500 * (aPerformance.audience - 20);
         }
-        thisAmount += 300 * perf.audience;
+        result += 300 * aPerformance.audience;
         break;
       default:
-        throw new Error(`알 수 없는 장르: ${play.type}`);
+        throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
     }
-
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    if (PlayType.comedy === play.type) {
-      volumeCredits += Math.floor(perf.audience / 5);
-    }
-
-    result += `  ${play.name}: ${format(thisAmount / 100)} (${
-      perf.audience
-    } seats)\n`;
-    totalAmout += thisAmount;
+    return result;
   }
-  result += `Amount owed is ${format(totalAmout / 100)}\n`;
-  result += `You earned ${volumeCredits} credits\n`;
-  return result;
 }
 
 function htmlStatement(invoice: Invoice, plays: Plays): any {
