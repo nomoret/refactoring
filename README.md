@@ -6,5 +6,8 @@
 ## 책과의 차이점
 - jest 사용
 - typescript 사용
+
+## 현재 진행 상황
+- [x] 1장 완료  
 ## Reference
 [예제코드 링크](https://github.com/wickedwukong/martin-fowler-refactoring-2nd)
