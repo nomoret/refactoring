@@ -22,6 +22,19 @@ interface Invoice {
   performances: Performance[];
 }
 
+interface PerformanceEx {
+  playID: string;
+  audience: number;
+  play: Play;
+  amount: number;
+  volummeCredits: number;
+}
+
+interface StatementData {
+  customer: string;
+  performances: PerformanceEx[];
+}
+
 function statement(invoice: Invoice, plays: Plays): string {
   const statementData: any = {};
   statementData.customer = invoice.customer;
@@ -42,7 +55,7 @@ function statement(invoice: Invoice, plays: Plays): string {
     return result;
   }
 
-  function amountFor(aPerformance: Performance) {
+  function amountFor(aPerformance: PerformanceEx) {
     let result = 0;
     switch (aPerformance.play.type) {
       case "tragedy":
@@ -64,10 +77,7 @@ function statement(invoice: Invoice, plays: Plays): string {
     return result;
   }
 
-  function volummeCreditsFor(aPerformance: {
-    playID: string;
-    audience: number;
-  }) {
+  function volummeCreditsFor(aPerformance: PerformanceEx) {
     let result = 0;
     result += Math.max(aPerformance.audience - 30, 0);
     if (PlayType.comedy === aPerformance.play.type) {
@@ -76,20 +86,12 @@ function statement(invoice: Invoice, plays: Plays): string {
     return result;
   }
 
-  function totalAmout(data: any) {
-    let result = 0;
-    for (let perf of data.performances) {
-      result += perf.amount;
-    }
-    return result;
+  function totalAmout(data: StatementData) {
+    return data.performances.reduce((total, p) => total + p.amount, 0);
   }
 
-  function totalVoulmeCredits(data: any) {
-    let result = 0;
-    for (let perf of data.performances) {
-      result += perf.volummeCredits;
-    }
-    return result;
+  function totalVoulmeCredits(data: StatementData) {
+    return data.performances.reduce((total, p) => total + p.volummeCredits, 0);
   }
 
   function renderPlainText(data: any, plays: Plays) {
