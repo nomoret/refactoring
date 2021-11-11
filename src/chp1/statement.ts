@@ -41,7 +41,7 @@ function statement(invoice: Invoice, plays: Plays): string {
   function renderPlainText(data: any, plays: Plays) {
     let result = `Statement for ${data.customer}\n`;
     for (let perf of data.performances) {
-      result += `  ${playFor(perf).name}: ${usd(amoutFor(perf))} (${
+      result += `  ${perf.play.name}: ${usd(amoutFor(perf))} (${
         perf.audience
       } seats)\n`;
     }
@@ -72,7 +72,7 @@ function statement(invoice: Invoice, plays: Plays): string {
     }) {
       let result = 0;
       result += Math.max(aPerformance.audience - 30, 0);
-      if (PlayType.comedy === playFor(aPerformance).type) {
+      if (PlayType.comedy === aPerformance.play.type) {
         result += Math.floor(aPerformance.audience / 5);
       }
       return result;
@@ -88,7 +88,7 @@ function statement(invoice: Invoice, plays: Plays): string {
 
     function amoutFor(aPerformance: Performance) {
       let result = 0;
-      switch (playFor(aPerformance).type) {
+      switch (aPerformance.play.type) {
         case "tragedy":
           result = 40000;
           if (aPerformance.audience) {
@@ -103,7 +103,7 @@ function statement(invoice: Invoice, plays: Plays): string {
           result += 300 * aPerformance.audience;
           break;
         default:
-          throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
+          throw new Error(`알 수 없는 장르: ${aPerformance.play.type}`);
       }
       return result;
     }
