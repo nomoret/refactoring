@@ -36,6 +36,7 @@ function statement(invoice: Invoice, plays: Plays): string {
     const result: any = Object.assign({}, aPerformance); // 얉은 복사
     result.play = playFor(result);
     result.amount = amountFor(result);
+    result.volummeCredits = volummeCreditsFor(result);
     return result;
   }
 
@@ -57,6 +58,18 @@ function statement(invoice: Invoice, plays: Plays): string {
         break;
       default:
         throw new Error(`알 수 없는 장르: ${aPerformance.play.type}`);
+    }
+    return result;
+  }
+
+  function volummeCreditsFor(aPerformance: {
+    playID: string;
+    audience: number;
+  }) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if (PlayType.comedy === aPerformance.play.type) {
+      result += Math.floor(aPerformance.audience / 5);
     }
     return result;
   }
@@ -84,19 +97,7 @@ function statement(invoice: Invoice, plays: Plays): string {
     function totalVoulmeCredits() {
       let result = 0;
       for (let perf of data.performances) {
-        result += volummeCreditsFor(perf);
-      }
-      return result;
-    }
-
-    function volummeCreditsFor(aPerformance: {
-      playID: string;
-      audience: number;
-    }) {
-      let result = 0;
-      result += Math.max(aPerformance.audience - 30, 0);
-      if (PlayType.comedy === aPerformance.play.type) {
-        result += Math.floor(aPerformance.audience / 5);
+        result += perf.volummeCredits;
       }
       return result;
     }
