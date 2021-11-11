@@ -41,6 +41,28 @@ class PerformanceCalculator {
     this.performance = aPerformance;
     this.play = play;
   }
+
+  get amount() {
+    let result = 0;
+    switch (this.play.type) {
+      case "tragedy":
+        result = 40000;
+        if (this.performance.audience) {
+          result += 1000 * (this.performance.audience - 30);
+        }
+        break;
+      case "comedy":
+        result = 30000;
+        if (this.performance.audience > 20) {
+          result += 10000 + 500 * (this.performance.audience - 20);
+        }
+        result += 300 * this.performance.audience;
+        break;
+      default:
+        throw new Error(`알 수 없는 장르: ${this.play.type}`);
+    }
+    return result;
+  }
 }
 
 export function createStatementData(invoice: Invoice, plays: Plays) {
@@ -66,30 +88,8 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
     );
     const result: any = Object.assign({}, aPerformance); // 얉은 복사
     result.play = calculator.play;
-    result.amount = amountFor(result);
+    result.amount = calculator.amount;
     result.volummeCredits = volummeCreditsFor(result);
-    return result;
-  }
-
-  function amountFor(aPerformance: PerformanceEx) {
-    let result = 0;
-    switch (aPerformance.play.type) {
-      case "tragedy":
-        result = 40000;
-        if (aPerformance.audience) {
-          result += 1000 * (aPerformance.audience - 30);
-        }
-        break;
-      case "comedy":
-        result = 30000;
-        if (aPerformance.audience > 20) {
-          result += 10000 + 500 * (aPerformance.audience - 20);
-        }
-        result += 300 * aPerformance.audience;
-        break;
-      default:
-        throw new Error(`알 수 없는 장르: ${aPerformance.play.type}`);
-    }
     return result;
   }
 }
