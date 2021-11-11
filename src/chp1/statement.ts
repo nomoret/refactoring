@@ -28,8 +28,13 @@ function statement(invoice: Invoice, plays: Plays): string {
   statementData.performances = invoice.performances.map(enrichPerformance);
   return renderPlainText(statementData, plays);
 
+  function playFor(aPerformance: Performance) {
+    return plays[aPerformance.playID];
+  }
+
   function enrichPerformance(aPerformance: Performance) {
-    const result = Object.assign({}, aPerformance); // 얉은 복사
+    const result: any = Object.assign({}, aPerformance); // 얉은 복사
+    result.play = playFor(result);
     return result;
   }
 
@@ -79,10 +84,6 @@ function statement(invoice: Invoice, plays: Plays): string {
         currency: "USD",
         minimumFractionDigits: 2,
       }).format(aNumber / 100);
-    }
-
-    function playFor(aPerformance: Performance) {
-      return plays[aPerformance.playID];
     }
 
     function amoutFor(aPerformance: Performance) {
