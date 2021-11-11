@@ -34,6 +34,15 @@ export interface Plays {
   [index: string]: Play;
 }
 
+class PerformanceCalculator {
+  performance: Performance;
+  play: Play;
+  constructor(aPerformance: Performance, play: Play) {
+    this.performance = aPerformance;
+    this.play = play;
+  }
+}
+
 export function createStatementData(invoice: Invoice, plays: Plays) {
   const statementData: StatementData = {
     performances: [],
@@ -46,13 +55,17 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
   statementData.totalVoulmeCredits = totalVoulmeCredits(statementData);
   return statementData;
 
-  function playFor(aPerformance: PerformanceEx) {
+  function playFor(aPerformance: Performance) {
     return plays[aPerformance.playID];
   }
 
   function enrichPerformance(aPerformance: Performance) {
+    const calculator = new PerformanceCalculator(
+      aPerformance,
+      playFor(aPerformance)
+    );
     const result: any = Object.assign({}, aPerformance); // 얉은 복사
-    result.play = playFor(result);
+    result.play = calculator.play;
     result.amount = amountFor(result);
     result.volummeCredits = volummeCreditsFor(result);
     return result;
