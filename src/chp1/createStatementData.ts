@@ -46,11 +46,7 @@ class PerformanceCalculator {
     let result = 0;
     switch (this.play.type) {
       case "tragedy":
-        result = 40000;
-        if (this.performance.audience) {
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
+        throw "오류 발생";
       case "comedy":
         result = 30000;
         if (this.performance.audience > 20) {
@@ -67,7 +63,15 @@ class PerformanceCalculator {
 
 class ComedyCaculator extends PerformanceCalculator {}
 
-class TragedyCaculator extends PerformanceCalculator {}
+class TragedyCaculator extends PerformanceCalculator {
+  get amount() {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
 
 export function createStatementData(invoice: Invoice, plays: Plays) {
   const statementData: StatementData = {
